@@ -29,7 +29,7 @@ public abstract class GameOptionsMixin {
         expect = 4,
         allow = 4
     )
-    private KeyBinding createAnalogBindings(String translationKey, int code, String category) {
+    private KeyBinding createAnalogBindings(String translationKey, int code, KeyBinding.Category category) {
         return new AnalogKeyBinding(translationKey, code, category);
     }
 }

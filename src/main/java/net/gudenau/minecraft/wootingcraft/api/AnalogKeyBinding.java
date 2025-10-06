@@ -104,7 +104,7 @@ public final class AnalogKeyBinding extends KeyBinding {
      * @param code The default keycode
      * @param category The category of this binding
      */
-    public AnalogKeyBinding(String translationKey, int code, String category) {
+    public AnalogKeyBinding(String translationKey, int code, Category category) {
         super(translationKey, InputUtil.Type.KEYSYM, code, category);
 
         ANALOG_BINDINGS.add(this);

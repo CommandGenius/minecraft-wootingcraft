@@ -5,6 +5,8 @@ import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.gudenau.minecraft.wootingcraft.mixin.InputAccessor;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.PlayerInput;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
@@ -36,7 +38,7 @@ public abstract class KeyboardInputMixin extends Input {
         at = @At("HEAD"),
         cancellable = true
     )
-    private void tick(boolean slowDown, float slowFactor, CallbackInfo ci) {
+    private void tick(CallbackInfo ci) {
         var longMovement = gud_wootingcraft$getMovement(settings.forwardKey, settings.backKey);
         var latMovement = gud_wootingcraft$getMovement(settings.leftKey, settings.rightKey);
 
@@ -50,13 +52,10 @@ public abstract class KeyboardInputMixin extends Input {
             settings.sprintKey.isPressed()
         );
 
-        if (slowDown) {
-            longMovement *= slowFactor;
-            latMovement *= slowFactor;
-        }
-
-        movementForward = longMovement;
-        movementSideways = latMovement;
+        movementVector = (new Vec2f(latMovement, longMovement)).normalize();
+        
+        Vec2f inputVector = new Vec2f(latMovement, longMovement);
+        ((InputAccessor)this).setMovementVector(inputVector);
 
         ci.cancel();
     }

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_22",
   "mixins": [
     "GameOptionsMixin",
+    "InputAccessor",
     "KeyBindingAccessor",
     "KeyBindingMixin",
     "KeybindsScreenMixin",
@@ -12,6 +13,5 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "plugin": "net.gudenau.minecraft.wootingcraft.mixin.Plugin"
+  }
 }
