@@ -1,10 +1,12 @@
 package net.gudenau.minecraft.wootingcraft.mixin;
 
 import net.gudenau.minecraft.wootingcraft.impl.KeybindsScreenState;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +51,7 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
             shift = At.Shift.BEFORE
         )
     )
-    private void mouseClickedUnbind(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> ci) {
+    private void mouseClickedUnbind(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
         gud_wootingcraft$state.decrementKey(boundKey);
     }
@@ -62,7 +64,7 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
             shift = At.Shift.AFTER
         )
     )
-    private void mouseClickedBind(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> ci) {
+    private void mouseClickedBind(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
         gud_wootingcraft$state.incrementKey(boundKey);
         gud_wootingcraft$state.flush();
@@ -76,7 +78,7 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
             shift = At.Shift.BEFORE
         )
     )
-    private void keyPressedUnbind(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
+    private void keyPressedUnbind(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
         gud_wootingcraft$state.decrementKey(boundKey);
     }
@@ -89,7 +91,7 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
             shift = At.Shift.AFTER
         )
     )
-    private void keyPressedBind(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci) {
+    private void keyPressedBind(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
         gud_wootingcraft$state.incrementKey(boundKey);
         gud_wootingcraft$state.flush();
