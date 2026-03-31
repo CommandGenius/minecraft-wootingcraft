@@ -1,9 +1,9 @@
 package net.gudenau.minecraft.wootingcraft.impl;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.gudenau.minecraft.wootingcraft.api.RgbSession;
-import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.Cleaner;
@@ -33,7 +33,7 @@ public final class KeybindsScreenState implements AutoCloseable {
     /**
      * Tracks how many usages each key has.
      */
-    private final Object2IntMap<InputUtil.Key> keyUsage = new Object2IntOpenHashMap<>();
+    private final Object2IntMap<InputConstants.Key> keyUsage = new Object2IntOpenHashMap<>();
 
     public KeybindsScreenState() {
         this.session = new RgbSession();
@@ -61,7 +61,7 @@ public final class KeybindsScreenState implements AutoCloseable {
      * @param key
      * @param count
      */
-    private void setKey(@NotNull InputUtil.Key key, int count) {
+    private void setKey(@NotNull InputConstants.Key key, int count) {
         int color = switch(count) {
             // Black for 0
             case 0 -> 0x00_00_00;
@@ -79,8 +79,8 @@ public final class KeybindsScreenState implements AutoCloseable {
      *
      * @param key The key to bump
      */
-    public void incrementKey(@NotNull InputUtil.Key key) {
-        if(key.getCategory() != InputUtil.Type.KEYSYM) {
+    public void incrementKey(@NotNull InputConstants.Key key) {
+        if(key.getType() != InputConstants.Type.KEYSYM) {
             return;
         }
 
@@ -93,8 +93,8 @@ public final class KeybindsScreenState implements AutoCloseable {
      *
      * @param key The key to bump
      */
-    public void decrementKey(@NotNull InputUtil.Key key) {
-        if(key.getCategory() != InputUtil.Type.KEYSYM) {
+    public void decrementKey(@NotNull InputConstants.Key key) {
+        if(key.getType() != InputConstants.Type.KEYSYM) {
             return;
         }
 

@@ -1,13 +1,13 @@
 package net.gudenau.minecraft.wootingcraft.mixin;
 
 import net.gudenau.minecraft.wootingcraft.api.AnalogKeyBinding;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.input.KeyboardInput;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
 import net.gudenau.minecraft.wootingcraft.mixin.InputAccessor;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.PlayerInput;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Options;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.KeyboardInput;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,17 +15,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyboardInput.class)
-public abstract class KeyboardInputMixin extends Input {
-    @Shadow @Final private GameOptions settings;
+public abstract class KeyboardInputMixin extends ClientInput {
+    @Shadow @Final private Options options;
 
     @Unique
-    private static float gud_wootingcraft$getMovement(@NotNull KeyBinding positive, @NotNull KeyBinding negative) {
+    private static float gud_wootingcraft$getMovement(@NotNull KeyMapping positive, @NotNull KeyMapping negative) {
         if(positive instanceof AnalogKeyBinding analogPositive && negative instanceof AnalogKeyBinding analogNegative) {
             return analogPositive.pressedAmount() - analogNegative.pressedAmount();
         }
 
-        var positivePressed = positive.isPressed();
-        var negativePressed = negative.isPressed();
+        var positivePressed = positive.isDown();
+        var negativePressed = negative.isDown();
         if(positivePressed == negativePressed) {
             return 0;
         } else {
@@ -39,23 +39,23 @@ public abstract class KeyboardInputMixin extends Input {
         cancellable = true
     )
     private void tick(CallbackInfo ci) {
-        var longMovement = gud_wootingcraft$getMovement(settings.forwardKey, settings.backKey);
-        var latMovement = gud_wootingcraft$getMovement(settings.leftKey, settings.rightKey);
+        var longMovement = gud_wootingcraft$getMovement(options.keyUp, options.keyDown);
+        var latMovement = gud_wootingcraft$getMovement(options.keyLeft, options.keyRight);
 
-        playerInput = new PlayerInput(
+        keyPresses = new Input(
             longMovement > 0,
             longMovement < 0,
             latMovement > 0,
             latMovement < 0,
-            settings.jumpKey.isPressed(),
-            settings.sneakKey.isPressed(),
-            settings.sprintKey.isPressed()
+            options.keyJump.isDown(),
+            options.keyShift.isDown(),
+            options.keySprint.isDown()
         );
 
-        movementVector = (new Vec2f(latMovement, longMovement)).normalize();
+        moveVector = (new Vec2(latMovement, longMovement)).normalized();
         
-        Vec2f inputVector = new Vec2f(latMovement, longMovement);
-        ((InputAccessor)this).setMovementVector(inputVector);
+        Vec2 inputVector = new Vec2(latMovement, longMovement);
+        ((InputAccessor)this).setMoveVector(inputVector);
 
         ci.cancel();
     }

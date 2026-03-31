@@ -1,14 +1,14 @@
 package net.gudenau.minecraft.wootingcraft.mixin;
 
 import net.gudenau.minecraft.wootingcraft.api.AnalogKeyBinding;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
-@Mixin(GameOptions.class)
+@Mixin(Options.class)
 public abstract class GameOptionsMixin {
     /**
      * Redirects the movement keys to support analog inputs.
@@ -17,7 +17,7 @@ public abstract class GameOptionsMixin {
         method = "<init>",
         at = @At(
             value = "NEW",
-            target = "net/minecraft/client/option/KeyBinding"
+            target = "net/minecraft/client/KeyMapping"
         ),
         slice = @Slice(
             to = @At(
@@ -29,7 +29,7 @@ public abstract class GameOptionsMixin {
         expect = 4,
         allow = 4
     )
-    private KeyBinding createAnalogBindings(String translationKey, int code, KeyBinding.Category category) {
+    private KeyMapping createAnalogBindings(String translationKey, int code, KeyMapping.Category category) {
         return new AnalogKeyBinding(translationKey, code, category);
     }
 }

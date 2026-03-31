@@ -18,6 +18,6 @@ public class RenderSystemMixin {
         )
     )
     private static void pollEvents(CallbackInfo ci) {
-        AnalogKeyBinding.updatePressedStates();
+        AnalogKeyBinding.setAll();
     }
 }

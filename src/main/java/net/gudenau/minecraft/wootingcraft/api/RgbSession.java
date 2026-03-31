@@ -1,12 +1,13 @@
 package net.gudenau.minecraft.wootingcraft.api;
 
-import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
 import static net.gudenau.minecraft.wootingcraft.natives.WootingRgb.*;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * A helper to manage the state of RGB keyboards. All changes are buffered and sent to the keyboard when {@link #flush}
@@ -33,12 +34,12 @@ public final class RgbSession implements AutoCloseable {
      * @param key The key to set
      * @param color The RGB color
      */
-    public void setKey(@NotNull InputUtil.Key key, int color) {
-        if(key.getCategory() != InputUtil.Type.KEYSYM) {
+    public void setKey(@NotNull InputConstants.Key key, int color) {
+        if(key.getType() != InputConstants.Type.KEYSYM) {
             return;
         }
 
-        setKey(key.getCode(), color);
+        setKey(key.getValue(), color);
     }
 
     /**
@@ -50,7 +51,7 @@ public final class RgbSession implements AutoCloseable {
     }
 
     /**
-     * Internal version of {@link #setKey(InputUtil.Key, int)}.
+     * Internal version of {@link #setKey(InputConstants.Key, int)}.
      *
      * @param scancode The GLFW scancode to set
      * @param color The color to set

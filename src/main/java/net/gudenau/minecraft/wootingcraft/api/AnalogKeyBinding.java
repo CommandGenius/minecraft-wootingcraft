@@ -2,12 +2,11 @@ package net.gudenau.minecraft.wootingcraft.api;
 
 import net.gudenau.minecraft.wootingcraft.mixin.KeyBindingAccessor;
 import net.gudenau.minecraft.wootingcraft.natives.WootingAnalog;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryStack;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
  * A keybinding that supports analog inputs. The original Minecraft digital input subsystem works as normal, to get the
  * analog value you need to call {@link #pressedAmount()}.
  */
-public final class AnalogKeyBinding extends KeyBinding {
+public final class AnalogKeyBinding extends KeyMapping {
     /**
      * A list of all created analog bindings.
      */
@@ -30,15 +29,15 @@ public final class AnalogKeyBinding extends KeyBinding {
      *
      * @hidden
      */
-    public static void updatePressedStates() {
-        var minecraft = MinecraftClient.getInstance();
+    public static void setAll() {
+        var minecraft = Minecraft.getInstance();
         // Prevent movement when there is a screen open/window is not in focus
         if(
-            !minecraft.mouse.isCursorLocked() ||
-            minecraft.currentScreen != null ||
-            !minecraft.isWindowFocused()
+            !minecraft.mouseHandler.isMouseGrabbed() ||
+            minecraft.screen != null ||
+            !minecraft.isWindowActive()
         ) {
-            unpressAll();
+            releaseAll();
             return;
         }
 
@@ -57,10 +56,10 @@ public final class AnalogKeyBinding extends KeyBinding {
             var keys = ANALOG_BINDINGS.stream()
                 .map((binding) -> {
                     var key = binding.getKey();
-                    if(key.getCategory() != InputUtil.Type.KEYSYM) {
+                    if(key.getType() != InputConstants.Type.KEYSYM) {
                         return null;
                     }
-                    var keyCode = KeycodeMapper.glfwToHid(key.getCode());
+                    var keyCode = KeycodeMapper.glfwToHid(key.getValue());
                     if(keyCode == -1) {
                         return null;
                     }
@@ -88,7 +87,7 @@ public final class AnalogKeyBinding extends KeyBinding {
      *
      * @hidden
      */
-    public static void unpressAll() {
+    public static void releaseAll() {
         ANALOG_BINDINGS.forEach((binding) -> binding.pressedAmount = 0);
     }
 
@@ -98,14 +97,14 @@ public final class AnalogKeyBinding extends KeyBinding {
     private float pressedAmount;
 
     /**
-     * Creates a new analog key binding, the only supported type is {@link InputUtil.Type#KEYSYM KEYSYM}.
+     * Creates a new analog key binding, the only supported type is {@link InputConstants.Type#KEYSYM KEYSYM}.
      *
      * @param translationKey The translation key to use
      * @param code The default keycode
      * @param category The category of this binding
      */
     public AnalogKeyBinding(String translationKey, int code, Category category) {
-        super(translationKey, InputUtil.Type.KEYSYM, code, category);
+        super(translationKey, InputConstants.Type.KEYSYM, code, category);
 
         ANALOG_BINDINGS.add(this);
     }
@@ -125,7 +124,7 @@ public final class AnalogKeyBinding extends KeyBinding {
      * @return The currently bound key
      */
     @NotNull
-    private InputUtil.Key getKey() {
-        return ((KeyBindingAccessor)(Object) this).getBoundKey();
+    private InputConstants.Key getKey() {
+        return ((KeyBindingAccessor)(Object) this).getKey();
     }
 }

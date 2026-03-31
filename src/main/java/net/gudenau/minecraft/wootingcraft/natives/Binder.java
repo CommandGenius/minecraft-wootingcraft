@@ -1,6 +1,5 @@
 package net.gudenau.minecraft.wootingcraft.natives;
 
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.Platform;
@@ -11,6 +10,7 @@ import java.lang.invoke.MethodHandle;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import net.minecraft.util.Util;
 
 import static net.gudenau.minecraft.wootingcraft.WootingCraft.MOD_ID;
 
@@ -22,7 +22,7 @@ public final class Binder {
     private static final boolean SUPPORTED;
     private static final boolean UNIX;
     static {
-        var os = Util.getOperatingSystem();
+        var os = Util.getPlatform();
         boolean unix = true;
         var osName = switch(os) {
             case LINUX -> "linux";

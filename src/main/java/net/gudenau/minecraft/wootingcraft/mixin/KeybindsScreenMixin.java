@@ -1,14 +1,14 @@
 package net.gudenau.minecraft.wootingcraft.mixin;
 
 import net.gudenau.minecraft.wootingcraft.impl.KeybindsScreenState;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Options;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsSubScreen;
+import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(KeybindsScreen.class)
-public abstract class KeybindsScreenMixin extends GameOptionsScreen {
-    @Shadow @Nullable public KeyBinding selectedKeyBinding;
+@Mixin(KeyBindsScreen.class)
+public abstract class KeybindsScreenMixin extends OptionsSubScreen {
+    @Shadow @Nullable public KeyMapping selectedKey;
 
     @Unique
     private KeybindsScreenState gud_wootingcraft$state;
@@ -34,10 +34,10 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
         method = "<init>",
         at = @At("RETURN")
     )
-    private void init(Screen parent, GameOptions gameOptions, CallbackInfo ci) {
+    private void init(Screen parent, Options gameOptions, CallbackInfo ci) {
         gud_wootingcraft$state = new KeybindsScreenState();
-        for(KeyBinding binding : gameOptions.allKeys) {
-            var boundKey = ((KeyBindingAccessor) binding).getBoundKey();
+        for(KeyMapping binding : gameOptions.keyMappings) {
+            var boundKey = ((KeyBindingAccessor) binding).getKey();
             gud_wootingcraft$state.incrementKey(boundKey);
         }
         gud_wootingcraft$state.flush();
@@ -47,12 +47,12 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
         method = "mouseClicked",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/option/KeyBinding;setBoundKey(Lnet/minecraft/client/util/InputUtil$Key;)V",
+            target = "Lnet/minecraft/client/KeyMapping;setKey(Lcom/mojang/blaze3d/platform/InputConstants$Key;)V",
             shift = At.Shift.BEFORE
         )
     )
-    private void mouseClickedUnbind(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
+    private void mouseClickedUnbind(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        var boundKey = ((KeyBindingAccessor) selectedKey).getKey();
         gud_wootingcraft$state.decrementKey(boundKey);
     }
 
@@ -60,12 +60,12 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
         method = "mouseClicked",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/option/KeyBinding;setBoundKey(Lnet/minecraft/client/util/InputUtil$Key;)V",
+            target = "Lnet/minecraft/client/KeyMapping;setKey(Lcom/mojang/blaze3d/platform/InputConstants$Key;)V",
             shift = At.Shift.AFTER
         )
     )
-    private void mouseClickedBind(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
+    private void mouseClickedBind(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        var boundKey = ((KeyBindingAccessor) selectedKey).getKey();
         gud_wootingcraft$state.incrementKey(boundKey);
         gud_wootingcraft$state.flush();
     }
@@ -74,12 +74,12 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
         method = "keyPressed",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/option/KeyBinding;setBoundKey(Lnet/minecraft/client/util/InputUtil$Key;)V",
+            target = "Lnet/minecraft/client/KeyMapping;setKey(Lcom/mojang/blaze3d/platform/InputConstants$Key;)V",
             shift = At.Shift.BEFORE
         )
     )
-    private void keyPressedUnbind(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
-        var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
+    private void keyPressedUnbind(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
+        var boundKey = ((KeyBindingAccessor) selectedKey).getKey();
         gud_wootingcraft$state.decrementKey(boundKey);
     }
 
@@ -87,33 +87,33 @@ public abstract class KeybindsScreenMixin extends GameOptionsScreen {
         method = "keyPressed",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/option/KeyBinding;setBoundKey(Lnet/minecraft/client/util/InputUtil$Key;)V",
+            target = "Lnet/minecraft/client/KeyMapping;setKey(Lcom/mojang/blaze3d/platform/InputConstants$Key;)V",
             shift = At.Shift.AFTER
         )
     )
-    private void keyPressedBind(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
-        var boundKey = ((KeyBindingAccessor) selectedKeyBinding).getBoundKey();
+    private void keyPressedBind(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
+        var boundKey = ((KeyBindingAccessor) selectedKey).getKey();
         gud_wootingcraft$state.incrementKey(boundKey);
         gud_wootingcraft$state.flush();
     }
 
     // private synthetic method_60342(Lnet/minecraft/client/gui/widget/ButtonWidget;)V
     @Inject(
-        method = "method_60342",
+        method = "lambda$addFooter$0(Lnet/minecraft/client/gui/components/Button;)V",
         at = @At("TAIL")
     )
-    private void resetAll(ButtonWidget buttonWidget, CallbackInfo ci) {
+    private void resetAll(Button buttonWidget, CallbackInfo ci) {
         gud_wootingcraft$state.clear();
-        for(KeyBinding binding : gameOptions.allKeys) {
-            var boundKey = ((KeyBindingAccessor) binding).getBoundKey();
+        for(KeyMapping binding : options.keyMappings) {
+            var boundKey = ((KeyBindingAccessor) binding).getKey();
             gud_wootingcraft$state.incrementKey(boundKey);
         }
         gud_wootingcraft$state.flush();
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         gud_wootingcraft$state.close();
     }
 }
