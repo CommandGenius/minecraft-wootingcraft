@@ -1,7 +1,6 @@
 package net.gudenau.minecraft.wootingcraft.mixin;
 
 import net.gudenau.minecraft.wootingcraft.api.AnalogKeyBinding;
-import net.gudenau.minecraft.wootingcraft.mixin.InputAccessor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.ClientInput;
@@ -39,6 +38,7 @@ public abstract class KeyboardInputMixin extends ClientInput {
         cancellable = true
     )
     private void tick(CallbackInfo ci) {
+        AnalogKeyBinding.setAll();
         var longMovement = gud_wootingcraft$getMovement(options.keyUp, options.keyDown);
         var latMovement = gud_wootingcraft$getMovement(options.keyLeft, options.keyRight);
 
