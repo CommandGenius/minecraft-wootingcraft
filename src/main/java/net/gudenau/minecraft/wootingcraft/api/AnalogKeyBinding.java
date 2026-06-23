@@ -34,7 +34,7 @@ public final class AnalogKeyBinding extends KeyMapping {
         // Prevent movement when there is a screen open/window is not in focus
         if(
             !minecraft.mouseHandler.isMouseGrabbed() ||
-            minecraft.screen != null ||
+            minecraft.gui.screen() != null ||
             !minecraft.isWindowActive()
         ) {
             releaseAll();
